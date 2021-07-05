@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">MicrosoftClone</string>
+    <string name="microsoft_teams">Microsoft Teams</string>
+    <string name="xyz_example_com">xyz@example.com</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="u2022_u2022_u2022_u2022_u2022v_u2022_u2022_u2022_u2022">•••••••••</string>
+    <string name="no_account">No Account?</string>
+    <string name="create_one_for_free">Create one for free</string>
+    <string name="sign_up">Sign up</string>
+    <string name="first_name">First Name</string>
+    <string name="soujanya">Soujanya</string>
+    <string name="last_name">Last Name</string>
+    <string name="kolasani">kolasani</string>
+    <string name="xyz_gmail_com">xyz@gmail.com</string>
+    <string name="ps">........</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="cps">........</string>
+    <string name="create">Create</string>
+    <string name="already_have_an_account">Already have an account?</string>
+    <string name="sign_in">Sign in</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_home">Home</string>
+    <string name="title_dashboard">Dashboard</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="settings">Settings</string>
+    <string name="sign_out">Sign out</string>
+    <string name="textview">TextView</string>
+    <string name="todo">TODO</string>
+
+
+</resources>

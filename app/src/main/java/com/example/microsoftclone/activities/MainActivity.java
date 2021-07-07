@@ -2,35 +2,40 @@ package com.example.microsoftclone.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.microsoftclone.R;
 import com.example.microsoftclone.adapter.UserAdapter;
-import com.example.microsoftclone.model.user;
-import com.example.microsoftclone.utilities.PreferenceManager;
-import com.example.microsoftclone.utilities.constants;
+import com.example.microsoftclone.model.User;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.messaging.FirebaseMessaging;
+
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
-    BottomNavigationView bottomNavigationView;
-    PreferenceManager preferenceManager;
-    List<user> Users;
-    UserAdapter userAdapter;
-    RecyclerView recyclerView;
-    SwipeRefreshLayout swipeRefreshLayout;
+       BottomNavigationView bottomNavigationView;
+       List<User> Users;
+       UserAdapter userAdapter;
+       RecyclerView recyclerView;
+    FirebaseAuth mauth;
+       FirebaseDatabase database;
+       String s;
 
 
     @Override
@@ -38,12 +43,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//To get FCM_token of user for messaging
-        preferenceManager=new PreferenceManager(getApplicationContext());
-        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
-            if(task.isSuccessful())
-                sendfcmtoken(task.getResult());
-        });
+        //firebase instances
+        database=FirebaseDatabase.getInstance();
+        mauth=FirebaseAuth.getInstance();
+
+        updatetoken();
 
 
 //bottom navigation view
@@ -57,70 +61,49 @@ public class MainActivity extends AppCompatActivity {
                 else if(ide== R.id.navigation_notifications)
                     startActivity(new Intent(getApplicationContext(),NotificationsActivity.class));
                 else if(ide==R.id.navigation_sign_out)
-                    signout();
+                { mauth.signOut();
+                startActivity(new Intent(MainActivity.this,signinActivity.class));}
+
             return false;
         });
+
+
 //recycler view for the display of list of users
         recyclerView=findViewById(R.id.recyclerview);
 
         Users=new ArrayList<>();
-        userAdapter=new UserAdapter(Users);
+        userAdapter=new UserAdapter(Users,this);
         recyclerView.setAdapter(userAdapter);
-        swipeRefreshLayout=findViewById(R.id.refresh);
-        swipeRefreshLayout.setOnRefreshListener(this::getusers);
-        getusers();
-    }
-//method to get the users and data fom firebase database
-    private void getusers(){
-        swipeRefreshLayout.setRefreshing(true);
-        FirebaseFirestore data=FirebaseFirestore.getInstance();
-        data.collection(constants.KEY_COLLECTION_USERS).get().addOnCompleteListener(task -> {
-            String userid=preferenceManager.getString(constants.KEY_USER_ID);
-            if(task.isSuccessful() && task.getResult()!=null){
-                swipeRefreshLayout.setRefreshing(false);
+        LinearLayoutManager linearLayoutManager=new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        //getting users from database for display
+        database.getReference().child("Users").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull @NotNull DataSnapshot snapshot) {
                 Users.clear();
-                 for(QueryDocumentSnapshot documentSnapshot: task.getResult()){
-                     if(userid.equals(documentSnapshot.getId())){
-                         preferenceManager.putString(constants.REMOTE_MSG_INVITER_TOKEN,documentSnapshot.getString(constants.KEY_FCM_TOKEN));
-                         continue;
-                     }
-                         user User=new user();
-                         User.firstname=documentSnapshot.getString(constants.KEY_FIRST_NAME);
-                         User.lastname=documentSnapshot.getString(constants.KEY_LAST_NAME);
-                         User.email=documentSnapshot.getString(constants.KEY_EMAIL);
-                         User.token=documentSnapshot.getString(constants.KEY_FCM_TOKEN);
-                         User.uid=documentSnapshot.getId();
-                         Users.add(User);
-                 }
-                 if(Users.size()>0)
-                     userAdapter.notifyDataSetChanged();
-
-
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    User User=dataSnapshot.getValue(User.class);
+                    assert User != null;
+                    if(!User.getId().equals(Objects.requireNonNull(mauth.getCurrentUser()).getUid()))
+                       Users.add(User);
+                }
+                userAdapter.notifyDataSetChanged();
             }
-            else{
-                Toast.makeText(this, "No Users are available", Toast.LENGTH_SHORT).show();
+
+            @Override
+            public void onCancelled(@NonNull @NotNull DatabaseError error) {
             }
         });
     }
-//method to send fcm_token to database(firebase firestore)
-    private void sendfcmtoken(String token){
-    FirebaseFirestore data= FirebaseFirestore.getInstance();
-    DocumentReference documentReference= data.collection(constants.KEY_COLLECTION_USERS)
-                                        .document(preferenceManager.getString(constants.KEY_USER_ID));
-    documentReference.update(constants.KEY_FCM_TOKEN,token);
-}
 
-//method to go back to sign in page when logged out
-private void signout(){
-    FirebaseFirestore data= FirebaseFirestore.getInstance();
-    DocumentReference documentReference= data.collection(constants.KEY_COLLECTION_USERS)
-            .document(preferenceManager.getString(constants.KEY_USER_ID));
-    HashMap<String,Object> updates=new HashMap<>();
-    updates.put(constants.KEY_FCM_TOKEN, FieldValue.delete());
-    documentReference.update(updates).addOnSuccessListener(unused -> {
-        preferenceManager.clearPreferences();
-        startActivity(new Intent(getApplicationContext(),signinActivity.class));
-        finish();
-    })
-    .addOnFailureListener(e -> Toast.makeText(MainActivity.this, "Unable to sign out", Toast.LENGTH_SHORT).show());
-}}
+
+    //method to update token in database incase if app is uninstalled
+    public void updatetoken(){
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> s=task.getResult());
+       DatabaseReference dr =database.getReference("Users");
+       dr.child(Objects.requireNonNull(mauth.getCurrentUser()).getUid()).child("token");
+       Map<String, Object> updates = new HashMap<>();
+       updates.put("token", s);
+       dr.updateChildren(updates);
+     }
+}

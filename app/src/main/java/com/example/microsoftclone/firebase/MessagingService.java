@@ -105,6 +105,8 @@ public class MessagingService extends FirebaseMessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         super.onMessageReceived(remoteMessage);
+//        Intent intent = new Intent(getApplicationContext(), tpActivity.class);
+//        startActivity(intent);
         String type = remoteMessage.getData().get(constants.REMOTE_MSG_TYPE);
 
 
@@ -113,8 +115,8 @@ public class MessagingService extends FirebaseMessagingService {
             if (type.equals(constants.REMOTE_MSG_CALL)) {
                 Intent intent = new Intent(getApplicationContext(), incomingcallActivity.class);
                 intent.putExtra(constants.REMOTE_MSG_CALL_TYPE, remoteMessage.getData().get(constants.REMOTE_MSG_CALL_TYPE));
-                intent.putExtra(constants.KEY_FIRST_NAME, remoteMessage.getData().get(constants.KEY_FIRST_NAME));
-                intent.putExtra(constants.KEY_LAST_NAME, remoteMessage.getData().get(constants.KEY_LAST_NAME));
+                intent.putExtra(constants.KEY_USER_NAME, remoteMessage.getData().get(constants.KEY_USER_NAME));
+                intent.putExtra(constants.KEY_USER_ICON, remoteMessage.getData().get(constants.KEY_USER_ICON));
                 intent.putExtra(constants.REMOTE_MSG_INVITER_TOKEN,remoteMessage.getData().get(constants.REMOTE_MSG_INVITER_TOKEN));
                 intent.putExtra(constants.KEY_ROOM,remoteMessage.getData().get(constants.KEY_ROOM));
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

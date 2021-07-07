@@ -14,7 +14,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MicrosoftClone"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activities.dpActivity"></activity>
         <activity android:name=".activities.outgoingcallActivity" />
         <activity android:name=".activities.chatActivity" />
         <activity android:name=".activities.SignoutActivity" />

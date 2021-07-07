@@ -11,74 +11,92 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.microsoftclone.R;
-import com.example.microsoftclone.utilities.PreferenceManager;
-import com.example.microsoftclone.utilities.constants;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.Objects;
 
 
 public class signinActivity extends AppCompatActivity {
-     private EditText emailEt,pswdEt;
-     private MaterialButton signinButton;
-     private ProgressBar signinpb;
-     private PreferenceManager preferenceManager;
+      EditText emailEt,pswdEt;
+      MaterialButton signinButton;
+      ProgressBar signinpb;
+      String email,password;
+      FirebaseAuth mauth;
+      FirebaseDatabase database;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signin);
-        findViewById(R.id.free).setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), signupActivity.class)));
+
+        //findviewbyids
         emailEt=findViewById(R.id.emailEt);
         pswdEt=findViewById(R.id.pswdEt);
         signinButton=findViewById(R.id.signinbutton);
         signinpb=findViewById(R.id.signinpb);
-        preferenceManager=new PreferenceManager(getApplicationContext());
-        if(preferenceManager.getBoolean(constants.KEY_IS_SIGNED_IN)){
-            Intent intent =new Intent(getApplicationContext(),MainActivity.class);
-            startActivity(intent);
-        }
 
-        signinButton.setOnClickListener(v -> {
-             if(emailEt.getText().toString().trim().isEmpty())
-                Toast.makeText(signinActivity.this, "Enter your mail id", Toast.LENGTH_SHORT).show();
-             else if(!Patterns.EMAIL_ADDRESS.matcher(emailEt.getText().toString()).matches()){
-                 Toast.makeText(signinActivity.this, "Enter a valid email id", Toast.LENGTH_SHORT).show();
-             }
-            else if(pswdEt.getText().toString().trim().isEmpty())
-                Toast.makeText(signinActivity.this, "Enter your password", Toast.LENGTH_SHORT).show();
-            else{
-                signin();
-             }
-        });
+        //Firebase instances
+        mauth=FirebaseAuth.getInstance();
+        database=FirebaseDatabase.getInstance();
+
+
+        //onclicklisteners
+        // signin button
+
+        signinButton.setOnClickListener(v -> signin());
+        //create text
+        findViewById(R.id.free).setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), signupActivity.class)));
 
     }
 
-public void signin(){
-    signinButton.setVisibility(View.INVISIBLE);
-    signinpb.setVisibility(View.VISIBLE);
-    FirebaseFirestore database= FirebaseFirestore.getInstance();
-    database.collection(constants.KEY_COLLECTION_USERS)
-            .whereEqualTo(constants.KEY_EMAIL,emailEt.getText().toString())
-            .whereEqualTo(constants.KEY_PASSWORD,pswdEt.getText().toString())
-            .get()
-            .addOnCompleteListener(task -> {
-                if(task.isSuccessful() && task.getResult()!=null && task.getResult().getDocuments().size()>0){
-                    DocumentSnapshot documentSnapshot=task.getResult().getDocuments().get(0);
-                    preferenceManager.putBoolean(constants.KEY_IS_SIGNED_IN,true);
-                    preferenceManager.putString(constants.KEY_USER_ID, documentSnapshot.getId());
-                    preferenceManager.putString(constants.KEY_FIRST_NAME,documentSnapshot.getString(constants.KEY_FIRST_NAME));
-                    preferenceManager.putString(constants.KEY_LAST_NAME,documentSnapshot.getString(constants.KEY_LAST_NAME));
-                    preferenceManager.putString(constants.KEY_EMAIL,documentSnapshot.getString(constants.KEY_EMAIL));
-                    Intent intent=new Intent(getApplicationContext(),MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                }
-                else{
-                    signinButton.setVisibility(View.VISIBLE);
-                    signinpb.setVisibility(View.INVISIBLE);
-                    Toast.makeText(signinActivity.this, "Unable to sign in", Toast.LENGTH_SHORT).show();
-                }
-            });
+    //signin in using firebase authenication
+    public void signin(){
+        email=emailEt.getText().toString().trim();
+        password=pswdEt.getText().toString().trim();
+        if(email.isEmpty()){
+            emailEt.setError("Email is required");
+            emailEt.requestFocus();
+            return;}
+        if(!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+            emailEt.setError(" Enter a valid email id");
+            emailEt.requestFocus();
+            return;}
 
-}}
+        if(password.isEmpty()){
+            pswdEt.setError("Password is required");
+            pswdEt.requestFocus();
+            return;}
+
+        signinpb.setVisibility(View.VISIBLE);
+
+        mauth.signInWithEmailAndPassword(email, password).addOnCompleteListener((Task<AuthResult> task) -> {
+            signinpb.setVisibility(View.GONE);
+            if (task.isSuccessful()) {
+                finish();
+                Intent intent = new Intent(signinActivity.this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+            } else {
+                Toast.makeText(getApplicationContext(), Objects.requireNonNull(task.getException()).getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+//if already sign in go to mainactivity
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        if (mauth.getCurrentUser() != null) {
+            finish();
+            startActivity(new Intent(this, MainActivity.class));
+        }
+    }
+}

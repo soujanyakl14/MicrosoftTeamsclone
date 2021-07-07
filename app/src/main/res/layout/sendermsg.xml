@@ -4,11 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginStart="5dp"
+    android:layout_marginStart="15dp"
     android:layout_marginEnd="7dp"
+    android:layout_marginBottom="4dp"
     android:maxWidth="310dp"
     android:maxHeight="400dp"
-    android:minHeight="30dp"
+    android:minHeight="35dp"
     android:background="@drawable/sender">
 
     <TextView

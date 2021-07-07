@@ -10,26 +10,17 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.microsoftclone.R;
-import com.example.microsoftclone.model.message;
-import com.example.microsoftclone.model.user;
-import com.example.microsoftclone.utilities.PreferenceManager;
-import com.example.microsoftclone.utilities.constants;
-import com.google.firebase.database.snapshot.Index;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.microsoftclone.model.Message;
+import com.google.firebase.auth.FirebaseAuth;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-import static org.webrtc.ContextUtils.getApplicationContext;
-
 public class ChatAdapter extends RecyclerView.Adapter {
-    List<message> messages;
-    Context context;
-    PreferenceManager preferenceManager=new PreferenceManager(context.getApplicationContext());
-    public ChatAdapter(List<message> messages,Context context) {
+    List<Message> messages;
+    public ChatAdapter(List<Message> messages, Context context) {
         this.messages = messages;
-        this.context=context;
     }
 
     int SENDER=0;
@@ -74,20 +65,19 @@ public class ChatAdapter extends RecyclerView.Adapter {
     @NotNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent,int viewType) {
-        context=parent.getContext();
         if(viewType==SENDER){
-            View v= LayoutInflater.from(parent.getContext()).inflate(R.layout.sendermsg,parent,false);
+            View v= LayoutInflater.from(parent.getContext()).inflate(R.layout.receiver_msg,parent,false);
             return new senderViewHolder(v);
         }
         else{
-            View v= LayoutInflater.from(parent.getContext()).inflate(R.layout.receiver_msg,parent,false);
+            View v= LayoutInflater.from(parent.getContext()).inflate(R.layout.sendermsg,parent,false);
             return new receiverViewHolder(v);
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        if(messages.get(position).getId()==preferenceManager.getString(constants.KEY_USER_ID))
+        if(messages.get(position).getId()== FirebaseAuth.getInstance().getCurrentUser().getUid())
             return SENDER;
         else
             return RECEIVER;
@@ -113,7 +103,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
         TextView receivertext;
         public receiverViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
-            receivertext=itemView.findViewById(R.id.receivertext);
+            receivertext=itemView.findViewById(R.id.senderText);
 
         }
     }
@@ -122,7 +112,7 @@ public class ChatAdapter extends RecyclerView.Adapter {
        public TextView sendertext;
         public senderViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
-            sendertext=itemView.findViewById(R.id.senderText);
+            sendertext=itemView.findViewById(R.id.receivertext);
         }
 
     }}

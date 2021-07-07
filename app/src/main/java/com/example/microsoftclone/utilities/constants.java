@@ -10,6 +10,7 @@ public class constants {
     public static final String KEY_PASSWORD="password";
     public static final String KEY_IS_SIGNED_IN="signed in";
     public static final String KEY_USER_ID="user_id";
+    public static final String KEY_USER_ICON="usericon";
     public static final String KEY_FCM_TOKEN="fcm_token";
     public static final String KEY_USER_NAME="username";
     public static final String REMOTE_MSG_AUTHORIZATION="Authorization";

@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -17,6 +18,11 @@ import com.example.microsoftclone.R;
 import com.example.microsoftclone.networking.apiService;
 import com.example.microsoftclone.networking.apiclient;
 import com.example.microsoftclone.utilities.constants;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import org.jetbrains.annotations.NotNull;
 import org.jitsi.meet.sdk.JitsiMeetActivity;
@@ -33,7 +39,14 @@ import retrofit2.Response;
 public class incomingcallActivity extends AppCompatActivity {
     TextView textCallingType,textUserName,textUserIcon;
     ImageView imageAccept,imageReject;
+    FirebaseDatabase database;
+    FirebaseAuth mauth;
      String call;
+     public String callername,callericon,id;
+
+    public incomingcallActivity() {
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,10 +56,16 @@ public class incomingcallActivity extends AppCompatActivity {
         textUserIcon=findViewById(R.id.textUsericon);
         imageAccept=findViewById(R.id.imageAccept);
         imageReject=findViewById(R.id.imageReject);
+
+        mauth=FirebaseAuth.getInstance();
+        database=FirebaseDatabase.getInstance();
+
+
         call="Incoming "+getIntent().getStringExtra(constants.REMOTE_MSG_CALL_TYPE)+" Call";
         textCallingType.setText(call);
-        textUserName.setText(String.format("%s %s",getIntent().getStringExtra(constants.KEY_FIRST_NAME),getIntent().getStringExtra(constants.KEY_LAST_NAME)));
-        textUserIcon.setText(String.format("%s%s",getIntent().getStringExtra(constants.KEY_FIRST_NAME).charAt(0),getIntent().getStringExtra(constants.KEY_LAST_NAME).charAt(0)));
+//        Toast.makeText(this, getIntent().getStringExtra(constants.KEY_USER_NAME), Toast.LENGTH_SHORT).show();
+        textUserName.setText(getIntent().getStringExtra(constants.KEY_USER_NAME));
+        textUserIcon.setText(getIntent().getStringExtra(constants.KEY_USER_ICON));
         imageAccept.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -2,11 +2,14 @@ package com.example.microsoftclone.model;
 
 import java.io.Serializable;
 
-public class message implements Serializable {
+public class Message implements Serializable {
 
     public String id,msg;
 
-    public message(String msg,String id) {
+    public Message() {
+    }
+
+    public Message(String id, String msg) {
         this.msg = msg;
         this.id=id;
     }

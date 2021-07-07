@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.microsoftclone.R;
 import com.example.microsoftclone.activities.chatActivity;
-import com.example.microsoftclone.model.user;
+import com.example.microsoftclone.model.User;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -20,16 +20,16 @@ import java.util.List;
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
     private Context context;
-    private List<user> Users;
-    public UserAdapter(List<user> users) {
+    private List<User> Users;
+    public UserAdapter(List<User> users,Context context) {
         this.Users = users;
+        this.context=context;
     }
     @NonNull
     @NotNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-        View v= LayoutInflater.from(parent.getContext()).inflate(R.layout.user_view,parent,false);
-        context= parent.getContext();
+        View v= LayoutInflater.from(context).inflate(R.layout.user_view,parent,false);
         return new UserViewHolder(v);
     }
 
@@ -38,10 +38,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
  holder.setdata(Users.get(position));
  holder.itemView.setOnClickListener(v -> {
      Intent chat = new Intent(context,chatActivity.class);
-     chat.putExtra("FCM_TOKEN",Users.get(position).token);
-     chat.putExtra("FIRST_NAME",Users.get(position).firstname);
-     chat.putExtra("LAST_NAME",Users.get(position).lastname);
-     chat.putExtra("USER_ID",Users.get(position).uid);
+     chat.putExtra("FCM_TOKEN",Users.get(position).getToken());
+     chat.putExtra("FIRST_NAME",Users.get(position).getFirstname());
+     chat.putExtra("LAST_NAME",Users.get(position).getLastname());
+     chat.putExtra("USER_ID",Users.get(position).getId());
      context.startActivity(chat);
 
  });
@@ -62,10 +62,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             textUsername= itemView.findViewById(R.id.textUsername);
             textEmail= itemView.findViewById(R.id.textEmail);
         }
-        void setdata(user User){
-            textUsericon.setText(User.firstname.charAt(0)+User.lastname.substring(0,1));
-            textUsername.setText(String.format("%s %s",User.firstname,User.lastname));
-            textEmail.setText(User.email);
+        public void setdata(User user){
+            textUsericon.setText(String.format("%s%s",user.getFirstname().charAt(0),user.getLastname().charAt(0)));
+            textUsername.setText(String.format("%s %s",user.getFirstname(),user.getLastname()));
+            textEmail.setText(user.getEmail());
         }
     }
 }

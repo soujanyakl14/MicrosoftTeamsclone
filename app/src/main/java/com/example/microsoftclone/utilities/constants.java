@@ -2,6 +2,7 @@ package com.example.microsoftclone.utilities;
 
 import java.util.HashMap;
 
+//constants inorder to reuse
 public class constants {
     public static final String KEY_COLLECTION_USERS="users";
     public static final String KEY_FIRST_NAME="first_name";
@@ -13,6 +14,13 @@ public class constants {
     public static final String KEY_USER_ICON="usericon";
     public static final String KEY_FCM_TOKEN="fcm_token";
     public static final String KEY_USER_NAME="username";
+    public static final String KEY_CHAT="chat";
+    public static final String REMOTE_MSG_TITLE="title";
+    public static final String REMOTE_MSG_BODY="body";
+    public static final String KEY_MSG_SENT="Messagesent";
+
+    public static final String KEY_NOTIFICATION_TITLE="notification_title";
+    public static final String KEY_NOTIFICATION_CONTENT="notification_content";
     public static final String REMOTE_MSG_AUTHORIZATION="Authorization";
     public static final String REMOTE_MSG_CONTENT_TYPE="Content-Type";
     public static final String REMOTE_MSG_TYPE="user_id";

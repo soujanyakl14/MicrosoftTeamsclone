@@ -35,27 +35,31 @@ public class signinActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signin);
 
+
         //findviewbyids
         emailEt=findViewById(R.id.emailEt);
         pswdEt=findViewById(R.id.pswdEt);
         signinButton=findViewById(R.id.signinbutton);
         signinpb=findViewById(R.id.signinpb);
 
+
+
         //Firebase instances
         mauth=FirebaseAuth.getInstance();
         database=FirebaseDatabase.getInstance();
 
 
-        //onclicklisteners
-        // signin button
 
+        //onclicklisteners
+
+        // signin button
         signinButton.setOnClickListener(v -> signin());
         //create text
         findViewById(R.id.free).setOnClickListener(v -> startActivity(new Intent(getApplicationContext(), signupActivity.class)));
 
     }
 
-    //signin in using firebase authenication
+    // method to signin  using firebase authentication and making sure entered details are valid
     public void signin(){
         email=emailEt.getText().toString().trim();
         password=pswdEt.getText().toString().trim();
@@ -74,7 +78,7 @@ public class signinActivity extends AppCompatActivity {
             return;}
 
         signinpb.setVisibility(View.VISIBLE);
-
+//firebase signin
         mauth.signInWithEmailAndPassword(email, password).addOnCompleteListener((Task<AuthResult> task) -> {
             signinpb.setVisibility(View.GONE);
             if (task.isSuccessful()) {
@@ -89,7 +93,7 @@ public class signinActivity extends AppCompatActivity {
     }
 
 
-//if already sign in go to mainactivity
+//if user is already sign in go to mainactivity
     @Override
     protected void onStart() {
         super.onStart();

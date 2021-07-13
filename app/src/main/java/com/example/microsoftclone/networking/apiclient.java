@@ -3,6 +3,8 @@ package com.example.microsoftclone.networking;
 import retrofit2.Retrofit;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
+
+//retrofit object initialisation
 public class apiclient {
     private static Retrofit retrofit=null;
     public static Retrofit getclient(){

@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Message implements Serializable {
 
-    public String id,msg;
+    public String id,msg,timestamp;
 
     public Message() {
     }
@@ -12,6 +12,14 @@ public class Message implements Serializable {
     public Message(String id, String msg) {
         this.msg = msg;
         this.id=id;
+    }
+
+    public String getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(String timestamp) {
+        this.timestamp = timestamp;
     }
 
     public String getId() {

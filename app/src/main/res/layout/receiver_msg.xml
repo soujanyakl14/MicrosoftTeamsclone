@@ -12,14 +12,15 @@
         android:layout_alignParentRight="true"
         android:layout_marginStart="5dp"
         android:layout_marginEnd="15dp"
-        android:background="@drawable/receiver"
         android:maxWidth="310dp"
         android:maxHeight="400dp"
-        android:minHeight="35dp">
+        android:minHeight="35dp"
+        android:background="@drawable/receiver"
+        android:id="@+id/cons">
 
 
         <TextView
-            android:id="@+id/receivertext"
+            android:id="@+id/displaymsg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
@@ -43,6 +44,16 @@
             app:layout_constraintGuide_end="14dp" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/timestamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="4dp"
+        android:layout_toLeftOf="@id/cons"
+        android:text="TextView"
+        android:visibility="gone"
+        android:layout_marginTop="@dimen/_9sdp"/>
 
 
 </RelativeLayout>

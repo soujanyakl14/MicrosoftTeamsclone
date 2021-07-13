@@ -27,10 +27,12 @@ import com.google.firebase.database.ValueEventListener;
 import org.jetbrains.annotations.NotNull;
 import org.jitsi.meet.sdk.JitsiMeetActivity;
 import org.jitsi.meet.sdk.JitsiMeetConferenceOptions;
+import org.jitsi.meet.sdk.JitsiMeetUserInfo;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.net.URL;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,8 +43,8 @@ public class incomingcallActivity extends AppCompatActivity {
     ImageView imageAccept,imageReject;
     FirebaseDatabase database;
     FirebaseAuth mauth;
-     String call;
-     public String callername,callericon,id;
+    String call;
+    public String callername,callericon,id;
 
     public incomingcallActivity() {
     }
@@ -57,13 +59,15 @@ public class incomingcallActivity extends AppCompatActivity {
         imageAccept=findViewById(R.id.imageAccept);
         imageReject=findViewById(R.id.imageReject);
 
+
+
+        //firebase instances
         mauth=FirebaseAuth.getInstance();
         database=FirebaseDatabase.getInstance();
 
 
         call="Incoming "+getIntent().getStringExtra(constants.REMOTE_MSG_CALL_TYPE)+" Call";
         textCallingType.setText(call);
-//        Toast.makeText(this, getIntent().getStringExtra(constants.KEY_USER_NAME), Toast.LENGTH_SHORT).show();
         textUserName.setText(getIntent().getStringExtra(constants.KEY_USER_NAME));
         textUserIcon.setText(getIntent().getStringExtra(constants.KEY_USER_ICON));
         imageAccept.setOnClickListener(new View.OnClickListener() {
@@ -81,6 +85,8 @@ public class incomingcallActivity extends AppCompatActivity {
 
     }
 
+
+//method to send remotemsg to server in order to send  response of receiver to caller
     private void callresponse(String response,String receiver_token){
         try {
             JSONArray tokens=new JSONArray();
@@ -145,8 +151,10 @@ public class incomingcallActivity extends AppCompatActivity {
                         Toast.makeText(incomingcallActivity.this,t.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
-}
+    }
 
+
+    //broadcastreceiver which is triggered by intent of onmessageservice used to get response of caller to receiver
     private BroadcastReceiver broadcastReceiver=new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -154,7 +162,7 @@ public class incomingcallActivity extends AppCompatActivity {
             if(type!=null){
                 if(type.equals(constants.REMOTE_MSG_CALL_CANCELLED))
                 {Toast.makeText(context, "Call Cancelled", Toast.LENGTH_SHORT).show();
-                  finish();
+                    finish();
                 }
             }
         }
@@ -174,3 +182,4 @@ public class incomingcallActivity extends AppCompatActivity {
         LocalBroadcastManager.getInstance(getApplicationContext()).unregisterReceiver(broadcastReceiver);
     }
 }
+

@@ -116,7 +116,7 @@ public class signupActivity extends AppCompatActivity {
         }
 
         progressDialog.show();
-
+        //creating account in firebase auth
         mauth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(task -> {
             progressDialog.dismiss();
             if (task.isSuccessful()) {
@@ -126,7 +126,8 @@ public class signupActivity extends AppCompatActivity {
                 database.getReference("Users").child(id).setValue(user);
                 finish();
                 startActivity(new Intent(signupActivity.this, MainActivity.class));
-            } else {
+            }
+            else {
                 if (task.getException() instanceof FirebaseAuthUserCollisionException) {
                     Toast.makeText(getApplicationContext(), "You are already registered", Toast.LENGTH_SHORT).show();
                 } else {

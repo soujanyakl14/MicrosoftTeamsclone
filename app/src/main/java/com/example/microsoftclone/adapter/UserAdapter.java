@@ -13,10 +13,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.microsoftclone.R;
 import com.example.microsoftclone.activities.chatActivity;
 import com.example.microsoftclone.model.User;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+//Adapter to hold users
 
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
     private Context context;
@@ -25,6 +33,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         this.Users = users;
         this.context=context;
     }
+
     @NonNull
     @NotNull
     @Override
@@ -37,6 +46,7 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public void onBindViewHolder(@NonNull @NotNull UserAdapter.UserViewHolder holder, int position) {
  holder.setdata(Users.get(position));
  holder.itemView.setOnClickListener(v -> {
+     //intent of user(receiver) info
      Intent chat = new Intent(context,chatActivity.class);
      chat.putExtra("FCM_TOKEN",Users.get(position).getToken());
      chat.putExtra("FIRST_NAME",Users.get(position).getFirstname());
@@ -61,11 +71,13 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             textUsericon= itemView.findViewById(R.id.textUsericon);
             textUsername= itemView.findViewById(R.id.textUsername);
             textEmail= itemView.findViewById(R.id.textEmail);
+
         }
         public void setdata(User user){
             textUsericon.setText(String.format("%s%s",user.getFirstname().charAt(0),user.getLastname().charAt(0)));
             textUsername.setText(String.format("%s %s",user.getFirstname(),user.getLastname()));
             textEmail.setText(user.getEmail());
+
         }
     }
 }

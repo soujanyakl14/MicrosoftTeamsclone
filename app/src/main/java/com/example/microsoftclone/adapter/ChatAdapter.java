@@ -1,6 +1,7 @@
 package com.example.microsoftclone.adapter;
 
 import android.content.Context;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,69 +16,40 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
-public class ChatAdapter extends RecyclerView.Adapter {
+//Adapter to hold messages
+
+public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.messageViewHolder> {
     List<Message> messages;
+    Context context;
     public ChatAdapter(List<Message> messages, Context context) {
         this.messages = messages;
+        this.context=context;
     }
 
     int SENDER=0;
     int RECEIVER=1;
 
-
-
-//
-//    @NonNull
-//    @NotNull
-//    @Override
-//    public senderViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
-//        View v= LayoutInflater.from(context).inflate(R.layout.sendermsg,parent,false);
-//         return new senderViewHolder(v);
-//    }
-//
-//    @Override
-//    public void onBindViewHolder(@NonNull @NotNull ChatAdapter.senderViewHolder holder, int position) {
-//        holder.sendertext.setText(position);
-//    }
-//
-//
-//
-//    @Override
-//    public int getItemCount() {
-//        return messages.size();
-//    }
-//    class senderViewHolder extends RecyclerView.ViewHolder {
-//       public TextView sendertext;
-//        public senderViewHolder(@NonNull @NotNull View itemView) {
-//            super(itemView);
-//            sendertext=itemView.findViewById(R.id.senderText);
-//        }
-//
-//    public ChatAdapter(List<message> messages,Context context) {
-//        this.messages = messages;
-//        this.context=context;
-//    }
-
-//
     @NonNull
     @NotNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent,int viewType) {
+    public messageViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent,int viewType) {
         if(viewType==SENDER){
-            View v= LayoutInflater.from(parent.getContext()).inflate(R.layout.receiver_msg,parent,false);
-            return new senderViewHolder(v);
+            View v= LayoutInflater.from(context).inflate(R.layout.receiver_msg,parent,false);
+            return new messageViewHolder(v);
         }
         else{
-            View v= LayoutInflater.from(parent.getContext()).inflate(R.layout.sendermsg,parent,false);
-            return new receiverViewHolder(v);
+            View v= LayoutInflater.from(context).inflate(R.layout.sendermsg,parent,false);
+            return new messageViewHolder(v);
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        if(messages.get(position).getId()== FirebaseAuth.getInstance().getCurrentUser().getUid())
+        if(messages.get(position).getId().equals(FirebaseAuth.getInstance().getCurrentUser().getUid()))
             return SENDER;
         else
             return RECEIVER;
@@ -90,30 +62,36 @@ public class ChatAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull @NotNull RecyclerView.ViewHolder holder, int position) {
-        if(holder.getClass()==senderViewHolder.class)
-            ( (senderViewHolder)holder).sendertext.setText(messages.get(position).getMsg());
-        else
-            ( (receiverViewHolder)holder).receivertext.setText(messages.get(position).getMsg());
+    public void onBindViewHolder(@NonNull @NotNull ChatAdapter.messageViewHolder holder, int position) {
+        String timeStamp = messages.get(holder.getAdapterPosition()).getTimestamp();
+        Calendar calendar=Calendar.getInstance(Locale.ENGLISH);
+        calendar.setTimeInMillis(Long.parseLong(timeStamp));
+        String datetime= DateFormat.format("dd/MM hh:mm aa",calendar).toString();
+           holder.displaymsg.setText(messages.get(position).getMsg());
+           holder.timestamp.setText(datetime);
+
+           //to display timestamp of msg on click on message and disappearing on double click
+           holder.displaymsg.setOnClickListener(new View.OnClickListener() {
+               @Override
+               public void onClick(View v) {
+                   if(holder.timestamp.getVisibility()==View.GONE)
+                       holder.timestamp.setVisibility(View.VISIBLE);
+                   else
+                       holder.timestamp.setVisibility(View.GONE);
+
+           }});
 
 }
 
 
-    public class receiverViewHolder extends RecyclerView.ViewHolder {
-        TextView receivertext;
-        public receiverViewHolder(@NonNull @NotNull View itemView) {
+    public class messageViewHolder extends RecyclerView.ViewHolder {
+        TextView displaymsg,timestamp;
+        public messageViewHolder(@NonNull @NotNull View itemView) {
             super(itemView);
-            receivertext=itemView.findViewById(R.id.senderText);
-
+            displaymsg=itemView.findViewById(R.id.displaymsg);
+            timestamp=itemView.findViewById(R.id.timestamp);
         }
     }
 
-    class senderViewHolder extends RecyclerView.ViewHolder {
-       public TextView sendertext;
-        public senderViewHolder(@NonNull @NotNull View itemView) {
-            super(itemView);
-            sendertext=itemView.findViewById(R.id.receivertext);
-        }
-
-    }}
+   }
 

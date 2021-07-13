@@ -37,6 +37,7 @@ import java.util.UUID;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+
 public class outgoingcallActivity extends AppCompatActivity {
     TextView textCallingtype,textUsername,textUsericon;
     ImageView end;
@@ -50,7 +51,10 @@ public class outgoingcallActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_outgoingcall);
-       textCallingtype=findViewById(R.id.textCallingtype);
+
+
+        //findviewbyids
+        textCallingtype=findViewById(R.id.textCallingtype);
         textUsername=findViewById(R.id.textUsername);
         textUsericon=findViewById(R.id.textUsericon);
         end=findViewById(R.id.end);
@@ -59,6 +63,8 @@ public class outgoingcallActivity extends AppCompatActivity {
 
         calltype=getIntent().getStringExtra("type")+" Calling";
 
+
+        //setting textviews with intents from chatActivity
         textCallingtype.setText(calltype);
         textUsericon.setText(getIntent().getStringExtra("usericon"));
         textUsername.setText(getIntent().getStringExtra("username"));
@@ -73,6 +79,9 @@ public class outgoingcallActivity extends AppCompatActivity {
         initiatecall(getIntent().getStringExtra("type"),getIntent().getStringExtra("receiver_token"));
     }
 
+
+
+    //method to send remote msgs to sever
     private void initiatecall(String calltype,String receiver_token){
         id= Objects.requireNonNull(mauth.getCurrentUser()).getUid();
         database.getReference("Users").child(id).addValueEventListener(new ValueEventListener() {
@@ -111,7 +120,7 @@ public class outgoingcallActivity extends AppCompatActivity {
         });
     }
 
-    //method to send data to server
+    //method to send data of response(cancelled) of caller to server
     private void callcancel(String receiver_token){
         try {
             JSONArray tokens=new JSONArray();
@@ -131,17 +140,17 @@ public class outgoingcallActivity extends AppCompatActivity {
     }
 
 
+    //api calling using retrofit classes
     private void sendremotemsgs(String remotemsgbody,String type){
         apiclient.getclient().create(apiService.class).sendremotemessages(constants.getHeaders(),remotemsgbody)
                 .enqueue(new Callback<String>() {
                     @Override
                     public void onResponse(@NotNull Call<String> call, @NotNull Response<String> response) {
                         if(response.isSuccessful()){
-                            return;
-//                            if(type.equals(constants.REMOTE_MSG_CALL))
-//                                Toast.makeText(outgoingcallActivity.this, "Calling succesfully", Toast.LENGTH_SHORT).show();
-//                             else if(type.equals(constants.REMOTE_MSG_CALL_RESPONSE))
-//                                Toast.makeText(outgoingcallActivity.this, "Call Cancelled", Toast.LENGTH_SHORT).show();
+                            if(type.equals(constants.REMOTE_MSG_CALL))
+                                Toast.makeText(outgoingcallActivity.this, "Calling succesfully", Toast.LENGTH_SHORT).show();
+                             else if(type.equals(constants.REMOTE_MSG_CALL_RESPONSE))
+                                Toast.makeText(outgoingcallActivity.this, "Call Cancelled", Toast.LENGTH_SHORT).show();
 
                         }
                         else
@@ -157,6 +166,8 @@ public class outgoingcallActivity extends AppCompatActivity {
     }
 
 
+
+//broadcastreceiver which is triggered by intent of onmessageservice used to get response of receiver to caller
     private final BroadcastReceiver broadcastReceiver=new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -166,14 +177,14 @@ public class outgoingcallActivity extends AppCompatActivity {
                 { try {
                     URL server=new URL("https://meet.jit.si");
                     JitsiMeetConferenceOptions.Builder jc =new JitsiMeetConferenceOptions.Builder();
-                            jc.setServerURL(server);
-                             jc.setWelcomePageEnabled(false);
-                            jc.setRoom(room);
-                            jc.build();
-                            if(getIntent().getStringExtra(constants.REMOTE_MSG_CALL_TYPE).equals("Audio"))
-                            {
-                                jc.setAudioOnly(true);
-                            }
+                    jc.setServerURL(server);
+                    jc.setWelcomePageEnabled(false);
+                    jc.setRoom(room);
+                    jc.build();
+                    if(getIntent().getStringExtra(constants.REMOTE_MSG_CALL_TYPE)=="Audio")
+                    {
+                        jc.setAudioOnly(true);
+                    }
                     JitsiMeetActivity.launch(outgoingcallActivity.this,jc.build());
                     finish();
 
@@ -192,6 +203,8 @@ public class outgoingcallActivity extends AppCompatActivity {
         }
     };
 
+
+    //registering broadcastreceiver
     @Override
     protected void onStart() {
         super.onStart();
@@ -199,7 +212,7 @@ public class outgoingcallActivity extends AppCompatActivity {
                 .registerReceiver(broadcastReceiver,new IntentFilter(constants.REMOTE_MSG_CALL_RESPONSE));
 
     }
-
+//unregestring
     @Override
     protected void onStop() {
         super.onStop();

@@ -12,6 +12,7 @@ public class User {
         this.email = email;
         this.token = token;
         this.id=id;
+
     }
 
     public String getFirstname() {
@@ -42,6 +43,7 @@ public class User {
         return token;
     }
 
+
     public void setToken(String token) {
         this.token = token;
     }
@@ -53,4 +55,5 @@ public class User {
     public void setUid(String id) {
         this.id = id;
     }
+
 }

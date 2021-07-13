@@ -16,12 +16,10 @@
         android:usesCleartextTraffic="true">
         <activity android:name=".activities.outgoingcallActivity" />
         <activity android:name=".activities.chatActivity" />
-        <activity android:name=".activities.SignoutActivity" />
         <activity android:name=".activities.NotificationsActivity" />
         <activity android:name=".activities.SettingsActivity" />
         <activity android:name=".activities.MainActivity" />
         <activity android:name=".activities.incomingcallActivity" />
-        <activity android:name=".tpActivity" />
         <activity
             android:name=".activities.signinActivity"
             android:screenOrientation="fullSensor"
